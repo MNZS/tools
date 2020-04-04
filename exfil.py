@@ -3,7 +3,6 @@
 import dns.resolver
 import binascii
 import argparse
-import time
 import random
 import string
 
@@ -36,6 +35,5 @@ with open (args.file,"r") as work_file:
 		for piece in break_line(line.rstrip(),16):
 			make_query(piece)
 			num += 1
-			#time.sleep(1)
 work_file.close()
 exit()
