@@ -33,11 +33,15 @@ def make_query(missing_piece):
 
 num = 1
 file_id =  random_string_digits()
+
+'''parse out a file name and shorten it to 12 chars'''
+header = args.file.split('/')[-1]
+
 with open (args.file,"r") as work_file:
-	make_query(args.file)
+	make_query(header)
 	num += 1
 	for line in work_file:
-		for piece in break_line(line.rstrip(),16):
+		for piece in break_line(line.rstrip(),19):
 			make_query(piece)
 			num += 1
 work_file.close()
