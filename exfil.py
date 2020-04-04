@@ -17,7 +17,6 @@ args = parser.parse_args()
 
 num = 1
 with open (args.file,"r") as work_file:
-	print("made it")
 	for line in work_file:
 		for piece in break_line(line.rstrip(),24):
 			string = ("%s\t%s\n"%(str(num).rjust(5,'0'),piece))
