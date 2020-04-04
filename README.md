@@ -1,4 +1,5 @@
 Tools!
 
-Things that I've made to make other things easier.
-Mostly scripty hacky things
+Mostly things that can POC hacking exploits.
+
+exfil.py - send stuff via dns tunneling
