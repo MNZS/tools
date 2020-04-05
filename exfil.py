@@ -40,7 +40,7 @@ num = 1
 for header in break_line(args.file,19):
 	make_query(header)
 	num += 1
-
+'''send file in small pieces to fit 63 character dns limitation'''
 with open (args.file,"r") as work_file:
 	for line in work_file:
 		for piece in break_line(line.rstrip(),19):
