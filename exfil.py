@@ -38,8 +38,6 @@ file_id =  random_string_digits()
 
 '''parse out a file name and shorten it to 19 chars'''
 header = args.file[-19:]
-print(header)
-exit()
 
 with open (args.file,"r") as work_file:
 	make_query(header)
