@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import division
 import dns.resolver
 import binascii
 import argparse
