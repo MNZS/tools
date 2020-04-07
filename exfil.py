@@ -33,20 +33,20 @@ def is_ascii(fn):
 	except:	
 		return 0
 
-def cobble_query(line,num):
+def format_query(line,num):
 	for piece in break_line(line.rstrip(),19):
-		num = make_query(piece,num)
+		num = run_query(piece,num)
 		num += 1
 	return num
 
-def format_query(wf,num,txt):
+def start_query(wf,num,txt):
 	if txt is 1:
 		for line in wf:
-			num = cobble_query(line,num)
+			num = format_query(line,num)
 	else:
-		num = cobble_query(wf,num) 
+		num = format_query(wf,num) 
 			
-def make_query(missing_piece,num):
+def run_query(missing_piece,num):
 	'''create a csv of data to piece together later'''
 	string = ("%s,%s,%s\n"%(file_id,f'{num:05}',missing_piece))
 	'''serialize the data'''
@@ -66,23 +66,22 @@ num = 1
 
 '''parse out a file name and create a header for data transfer'''
 for header in break_line(args.file,19):
-	num = make_query(header,num)
+	num = run_query(header,num)
 
 
 with open (args.file,"r") as work_file:
 	'''test if the file is ascii'''
 	if is_ascii(work_file) is 1:
 		work_file.seek(0)
-		format_query(work_file,num,1)
+		start_query(work_file,num,1)
+		work_file.close()
 	else:
 		work_file.close()
-		num = make_query('b64encoded',num)
+		num = run_query('b64encoded',num)
 		with open (args.file,'rb') as bin_file:
-			encoded = base64.b64encode(bin_file.read()).decode("utf-8")
-			format_query(encoded,num,0)
-			
+			enc_bin_file = base64.b64encode(bin_file.read()).decode("utf-8")
+			start_query(enc_bin_file,num,0)
 
-work_file.close()
 exit()
 
 '''
