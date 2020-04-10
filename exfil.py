@@ -36,7 +36,6 @@ def make_query(wf,num):
 					xfil_data,
 					file_id,
 					args.domain ))
-		print(tld)
 		try:
 			dns.resolver.query(tld,'TXT')
 		except:
