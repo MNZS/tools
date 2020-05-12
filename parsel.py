@@ -16,7 +16,7 @@ new_file = ''
 
 with open (log_file,'r') as work_log:
 	for line in work_log:
-		if line.split()[9] == 'TXT':
+		if line.split()[9] == 'TXT' and line.split()[7].split('.')[2] == file_id:
 			seq = int(line.split()[7].split('.')[0],16)
 			val = line.split()[7].split('.')[1]
 			struct[seq] = val
