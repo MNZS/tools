@@ -1,0 +1,6 @@
+<profile_short_name>:
+  profile: <profile_name>
+  template: <ec2_template>
+  template_version: <template_version>
+  subnet: <subnet_id>
+  key: <local_ssh_key_name>
