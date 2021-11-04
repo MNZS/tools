@@ -113,7 +113,7 @@ def list_droplets():
 def print_usage():
 	print("\nUsage:")
 	print("\tdodrop add <droplet name>")
-	print("\tdodrop rm <droplet id>")
+	print("\tdodrop rm <droplet name>")
 	print("\tdodrop ls\n")
 
 ## Start main routine
