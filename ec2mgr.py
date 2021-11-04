@@ -91,14 +91,14 @@ def create_new(instance_name):
 
 	instance_ip = instance_info['Reservations'][0]['Instances'][0]['PublicIpAddress']
 
-	## create and insert the new alias for .bash_local
+	## create and insert the new alias for bash file
 	alias_update = "alias {}='ssh -i ~/.ssh/{} ubuntu@{}'\n".format(instance_name,ssh_key,instance_ip)
 	with open (bash_file,"a") as bash_out:
 		bash_out.write(alias_update)
 
         ## print out a summary of what has been done
 	print("\nA new AWS instance is available for use.")
-	print("Type \". ~/.bash_local\" and then you")
+	print("Type \". ~/{}\" and then you".format(bash_file.split('/')[-1]))
 	print("can type \'{}\' to ssh into the host.\n".format(instance_name))
 
 def delete_existing(instance_name):
