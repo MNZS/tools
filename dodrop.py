@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-## Update bash.local with the new public IP address
-
 import json
 import re
 import requests
