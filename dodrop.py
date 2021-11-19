@@ -50,7 +50,7 @@ def add_droplet(d_name):
 	do_droplet_get_endpoint = "%s/%i" % (do_droplets_endpoint, do_data['droplet']['id'])
 	do_get_r = requests.get(do_droplet_get_endpoint, headers=do_headers)
 	do_get_data = do_get_r.json()
-	droplet_ip = do_get_data['droplet']['networks']['v4'][1]['ip_address']
+	droplet_ip = do_get_data['droplet']['networks']['v4'][0]['ip_address']
 
 	#time.sleep(60)
 
@@ -101,7 +101,7 @@ def list_droplets():
 	while count < drop_tot:
 		d_name = do_data['droplets'][count]['name']
 		d_id = do_data['droplets'][count]['id']
-		d_ip = do_data['droplets'][count]['networks']['v4'][1]['ip_address']
+		d_ip = do_data['droplets'][count]['networks']['v4'][0]['ip_address']
 		print("{:<22}{:<15}{}".format(d_name,d_id,d_ip))
 		count += 1	
 
