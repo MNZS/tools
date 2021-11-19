@@ -61,7 +61,7 @@ def add_droplet(d_name):
 
 	## print out a summary of what has been done
 	print("\nA new droplet is available for use.")
-	print("Type \". ~/{}\" and then you".format(bash_file.split('/').[-1]))
+	print("Type \". ~/{}\" and then you".format(bash_file.split('/')[-1]))
 	print("can type \"%s\" to ssh into the host.\n" % (d_name))
 
 ## delete an existing droplet
