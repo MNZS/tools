@@ -51,15 +51,22 @@ function check_for_updates() {
   if [ $(grep -c "\->" $TMP_FILE) -gt 0 ]; then
     NUM=`wc -l $TMP_FILE | cut -d' ' -f1`
     TIME=$(calendar ymdhms)
-    echo "$TIME - $NUM updates found" >> $LOG 2>&1
+
+    if [ $NUM -eq '1' ]; then
+	    NOUN='update'
+    else
+	    NOUN='updates'
+    if
+    echo "$TIME - $NUM $NOUN found" >> $LOG 2>&1
 
     if [ $(grep -G ^linux $TMP_FILE) -gt 0 ]; then
       update_motd
     fi
 
     while read -r line; do
-      PKG=`echo $line | cut -d ' ' -f1` 2>&1
-      echo "  $PKG" >> $LOG 2>&1
+      #PKG=`echo $line | cut -d ' ' -f1` 2>&1
+      #echo "  $PKG" >> $LOG 2>&1
+      echo "  $line" >> $LOG 2>&1
     done < $TMP_FILE
 
     /bin/pacman -Su --noconfirm 2>&1
