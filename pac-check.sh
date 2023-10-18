@@ -56,7 +56,7 @@ function check_for_updates() {
 	    NOUN='update'
     else
 	    NOUN='updates'
-    if
+    fi
     echo "$TIME - $NUM $NOUN found" >> $LOG 2>&1
 
     if [ $(grep -G ^linux $TMP_FILE) -gt 0 ]; then
