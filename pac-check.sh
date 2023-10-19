@@ -77,7 +77,7 @@ function check_for_updates() {
     echo "$TIME - No updates found" >> $LOG 2>&1
   fi
 
-  #rm -f $TMP_FILE
+  rm -f $TMP_FILE
 }
 
 function run_error_check {
