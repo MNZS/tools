@@ -27,10 +27,10 @@ function update_motd () {
   echo > /etc/motd
   echo >> /etc/motd
   echo "  This machine was rebooted!" >> /etc/motd
-  echo "  The kernel has been updated by apt-check " >> /etc/motd
+  echo "  The kernel has been updated by pac-check " >> /etc/motd
   echo "  This message created on $(calendar ymdhms) " >> /etc/motd
   echo " " >> /etc/motd
-  echo "  Run /root/bin/apt-check cleanup to clear " >> /etc/motd
+  echo "  Run /root/bin/pac-check cleanup to clear " >> /etc/motd
   echo "  this message " >> /etc/motd
   echo >> /etc/motd
   echo >> /etc/motd
@@ -59,13 +59,11 @@ function check_for_updates() {
     fi
     echo "$TIME - $NUM $NOUN found" >> $LOG 2>&1
 
-    if [ $(grep -G ^linux $TMP_FILE) -gt 0 ]; then
+    if [ $(grep -Gc ^linux $TMP_FILE) -gt 0 ]; then
       update_motd
     fi
 
     while read -r line; do
-      #PKG=`echo $line | cut -d ' ' -f1` 2>&1
-      #echo "  $PKG" >> $LOG 2>&1
       echo "  $line" >> $LOG 2>&1
     done < $TMP_FILE
 
@@ -77,7 +75,7 @@ function check_for_updates() {
     echo "$TIME - No updates found" >> $LOG 2>&1
   fi
 
-  rm -f $TMP_FILE
+  #rm -f $TMP_FILE
 }
 
 function run_error_check {
