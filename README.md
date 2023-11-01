@@ -11,7 +11,6 @@ dodrop.py - create and destroy droplets on Digital Ocean from the cli.
 
 pw_check.py - proof of concept for HaveIBeenPwned API range checks for passwords
 
-apt-check.sh - update and upgrade Debian from a cron job. Puts WAY too much 
-power in the hands of a script.
+apt-check.sh - update and upgrade Debian from a cron job. 
 
-pac-check.sh - update arch linux from a cron job.
+pac-check.sh - update arch linux from a systemd.timers job.
