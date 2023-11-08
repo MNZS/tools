@@ -1,20 +1,20 @@
 ## tools repository 
 
-Security
-  exfil.py - send stuff via dns tunneling. 
+<b>Security</b><p>
+&nbsp;&nbsp;&nbsp;&nbsp;exfil.py - send stuff via dns tunneling. 
 
-  parsel.py - put the stuff you sent back together. relies on bind9 querylog.
+&nbsp;&nbsp;&nbsp;&nbsp;parsel.py - put the stuff you sent back together. relies on bind9 querylog.
 
-  pw_check.py - proof of concept for HaveIBeenPwned API range checks for passwords
+&nbsp;&nbsp;&nbsp;&nbsp;pw_check.py - proof of concept for HaveIBeenPwned API range checks for passwords
 
-Cloud
-  ec2mgr.py - launch and terminate ec2 instances from the cli. 
+<b>Cloud</b><p>
+&nbsp;&nbsp;&nbsp;&nbsp;ec2mgr.py - launch and terminate ec2 instances from the cli. 
 
-  dodrop.py - create and destroy droplets on Digital Ocean from the cli.
+&nbsp;&nbsp;&nbsp;&nbsp;dodrop.py - create and destroy droplets on Digital Ocean from the cli.
 
-  lnmgr.py - create and destroy nodes on Linode from the cli.
+&nbsp;&nbsp;&nbsp;&nbsp;lnmgr.py - create and destroy nodes on Linode from the cli.
 
-Linux
-  apt-check.sh - update and upgrade Debian from a cron job. 
+<b>Linux</b><p>
+&nbsp;&nbsp;&nbsp;&nbsp;apt-check.sh - update and upgrade Debian from a cron job. 
 
-  pac-check.sh - update arch linux from a systemd.timers job.
+&nbsp;&nbsp;&nbsp;&nbsp;pac-check.sh - update arch linux from a systemd.timers job.
