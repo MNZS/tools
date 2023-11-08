@@ -1,6 +1,17 @@
-<profile_short_name>:
-  profile: <profile_name>
-  template: <ec2_template>
-  template_version: <template_version>
-  subnet: <subnet_id>
-  key: <local_ssh_key_name>
+---
+## this file should be saved as .tools.yaml in your home directory
+linode:
+  api: '' ## api key
+  alias: '' ## full path to the shell config file where aliases can be written
+  root: '' ## root password
+  ssh_user: ''
+
+aws:
+  profile: 'default' ## insert a named profile if preferred
+  alias: '' ## full path to the shell config file where aliases can be written
+  template_id: '' ## launch template id tag
+  template_version: '' ## launch template version
+
+do:
+  api: ## api key
+  alias: '' ## full path to the shell config file where aliases can be written
