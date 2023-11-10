@@ -79,6 +79,33 @@ def get_droplet(d_id):
   do_droplet_data = do_r.json()
   return do_droplet_data
 
+
+def completion_message(instance_name, instance_ip):
+
+  if args.cloud == 'aws':
+    instance_user = 'admin'
+    paas = 'AWS'
+  elif args.cloud == 'linode':
+    instance_user = 'root'
+    paas = 'Linode'
+  elif args.cloud == 'do':
+    instance_user = 'root'
+    paas = 'Digital Ocean'
+
+  bash_file = cloud_conf[args.cloud]['alias']
+
+  ## create and insert the new alias for bash file
+  alias_update = "alias {}='ssh {}@{}'\n".format(instance_name,
+                                                  instance_user,
+                                                  instance_ip)
+  with open (bash_file,"a") as bash_out:
+    bash_out.write(alias_update)
+
+  ## print out a summary of what has been done
+  print("\nA new {} instance is available for use.".format(paas))
+  print("Type \". ~/{}\" and then you".format(bash_file.split('/')[-1]))
+  print("can type \'{}\' to ssh into the host.\n".format(instance_name))
+
 ## add a new instance
 def create_new(instance_name):
 
@@ -121,15 +148,7 @@ def create_new(instance_name):
 
     instance_ip = instance_info['Reservations'][0]['Instances'][0]['PublicIpAddress']
 
-    ## create and insert the new alias for bash file
-    alias_update = "alias {}='ssh admin@{}'\n".format(instance_name,instance_ip)
-    with open (bash_file,"a") as bash_out:
-      bash_out.write(alias_update)
-
-    ## print out a summary of what has been done
-    print("\nA new AWS instance is available for use.")
-    print("Type \". ~/{}\" and then you".format(bash_file.split('/')[-1]))
-    print("can type \'{}\' to ssh into the host.\n".format(instance_name))
+    completion_message(instance_name, instance_ip)
 
   elif args.cloud == 'do':
     ## define the new droplet atttributes
@@ -154,17 +173,9 @@ def create_new(instance_name):
     do_droplet_get_endpoint = "%s/%i" % (do_droplets_endpoint, do_data['droplet']['id'])
     do_get_r = requests.get(do_droplet_get_endpoint, headers=do_headers)
     do_get_data = do_get_r.json()
-    droplet_ip = do_get_data['droplet']['networks']['v4'][0]['ip_address']
+    instance_ip = do_get_data['droplet']['networks']['v4'][0]['ip_address']
 
-    ## create and insert the new alias for .bash_local
-    alias_update = "alias %s='ssh root@%s'\n" % (instance_name, droplet_ip)
-    with open (cloud_conf['do']['alias'],"a") as bash_out:
-      bash_out.write(alias_update)
-
-    ## print out a summary of what has been done
-    print("\nA new Ocean Droplet is available for use.")
-    print("Type \". ~/{}\" and then you".format(cloud_conf['do']['alias'].split('/')[-1]))
-    print("can type \"%s\" to ssh into the host.\n" % (instance_name))
+    completion_message(instance_name, instance_ip)
 
   elif args.cloud == 'linode':
     ## define the endpoint url
@@ -185,15 +196,7 @@ def create_new(instance_name):
                         json=node_attr)
     lin_data = lin_r.json()
 
-    ## create and insert the new alias for .bash_local
-    alias_update = "alias %s='ssh root@%s'\n" % (instance_name, lin_data['ipv4'][0])
-    with open (cloud_conf['linode']['alias'],"a") as bash_out:
-      bash_out.write(alias_update)
-
-    ## print out a summary of what has been done
-    print("\nA new Linode is available for use.")
-    print("Type \". ~/{}\" and then you".format(cloud_conf['linode']['alias'].split('/')[-1]))
-    print("can type \"%s\" to ssh into the host.\n" % (instance_name))
+    completion_message(instance_name, lin_data['ipv4'][0])
 
 ## terminate an existing instance
 def delete_existing(instance_name):
@@ -221,8 +224,6 @@ def delete_existing(instance_name):
     print("\nSuccessfully shutting down {}\n".format(instance_name))
 
   elif args.cloud == 'do':
-
-    print('gonna try to remove something from do')
 
     ## create a new endpoint with the droplet's tag name
     do_droplet_del_endpoint = "%s?tag_name=%s" % (do_droplets_endpoint, instance_name)
