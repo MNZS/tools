@@ -51,7 +51,9 @@ elif args.cloud == 'do':
   do_droplets_endpoint = do_base_url + '/droplets'
   do_headers = { 'Authorization': 'Bearer '+cloud_conf['do']['api'], 'Content-Type':'application/json' }
 elif args.cloud == 'ln':
-  placeholder = ''
+  lin_api = cloud_conf['linode']['api']
+  lin_base_url = 'https://api.linode.com/v4/'
+  lin_headers = { 'Authorization': 'Bearer '+lin_api, 'Content-Type':'application/json' }
 else:
   print('wrong syntax')
   exit()
@@ -154,8 +156,6 @@ def create_new(instance_name):
     do_get_data = do_get_r.json()
     droplet_ip = do_get_data['droplet']['networks']['v4'][0]['ip_address']
 
-    print(droplet_ip)
-
     ## create and insert the new alias for .bash_local
     alias_update = "alias %s='ssh root@%s'\n" % (instance_name, droplet_ip)
     with open (cloud_conf['do']['alias'],"a") as bash_out:
@@ -164,6 +164,37 @@ def create_new(instance_name):
     ## print out a summary of what has been done
     print("\nA new Ocean Droplet is available for use.")
     print("Type \". ~/{}\" and then you".format(cloud_conf['do']['alias'].split('/')[-1]))
+    print("can type \"%s\" to ssh into the host.\n" % (instance_name))
+
+  elif args.cloud == 'ln':
+    ## define the endpoint url
+    lin_endpoint_url = lin_base_url+'linode/instances'
+
+    ## define the attributes of the new node in a dictionary
+    node_attr = {
+                  'image': cloud_conf['linode']['image'],
+                  'label': instance_name,
+                  'root_pass': cloud_conf['linode']['root'],
+                  'type': cloud_conf['linode']['type'],
+                  'authorized_users': [ cloud_conf['linode']['ssh_user'] ],
+                  'region': cloud_conf['linode']['region'],
+    }
+
+    lin_r = requests.post(lin_endpoint_url,
+                        headers=lin_headers,
+                        json=node_attr)
+    lin_data = lin_r.json()
+
+    print(lin_data['ipv4'][0])
+
+    ## create and insert the new alias for .bash_local
+    alias_update = "alias %s='ssh root@%s'\n" % (instance_name, lin_data['ipv4'][0])
+    with open (cloud_conf['linode']['alias'],"a") as bash_out:
+      bash_out.write(alias_update)
+
+    ## print out a summary of what has been done
+    print("\nA new Linode is available for use.")
+    print("Type \". ~/{}\" and then you".format(cloud_conf['linode']['alias'].split('/')[-1]))
     print("can type \"%s\" to ssh into the host.\n" % (instance_name))
 
 ## terminate an existing instance
