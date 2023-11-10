@@ -26,7 +26,7 @@ parser.add_argument('-a','--add',
 parser.add_argument('-r','--remove',
       help='remove instance')
 parser.add_argument('-c','--cloud',
-      help='cloud platform: aws/do/ln')
+      help='cloud platform: aws/do/linode')
 parser.add_argument('-l','--list',
       action='store_true',
       help='list running instances')
@@ -50,7 +50,7 @@ elif args.cloud == 'do':
   do_base_url='https://api.digitalocean.com/v2'
   do_droplets_endpoint = do_base_url + '/droplets'
   do_headers = { 'Authorization': 'Bearer '+cloud_conf['do']['api'], 'Content-Type':'application/json' }
-elif args.cloud == 'ln':
+elif args.cloud == 'linode':
   lin_api = cloud_conf['linode']['api']
   lin_base_url = 'https://api.linode.com/v4/'
   lin_headers = { 'Authorization': 'Bearer '+lin_api, 'Content-Type':'application/json' }
@@ -166,7 +166,7 @@ def create_new(instance_name):
     print("Type \". ~/{}\" and then you".format(cloud_conf['do']['alias'].split('/')[-1]))
     print("can type \"%s\" to ssh into the host.\n" % (instance_name))
 
-  elif args.cloud == 'ln':
+  elif args.cloud == 'linode':
     ## define the endpoint url
     lin_endpoint_url = lin_base_url+'linode/instances'
 
@@ -184,8 +184,6 @@ def create_new(instance_name):
                         headers=lin_headers,
                         json=node_attr)
     lin_data = lin_r.json()
-
-    print(lin_data['ipv4'][0])
 
     ## create and insert the new alias for .bash_local
     alias_update = "alias %s='ssh root@%s'\n" % (instance_name, lin_data['ipv4'][0])
@@ -248,6 +246,30 @@ def delete_existing(instance_name):
       f.truncate()
 
     ## print out summary of what has been done
+    print("\nSuccessfully shutting down {}\n".format(instance_name))
+  
+  elif args.cloud == 'linode':
+
+    ## define the endpoint url
+    lin_endpoint_url = lin_base_url+'linode/instances'
+
+    lin_r = requests.get(lin_endpoint_url,
+                          headers = lin_headers)
+    lin_list = lin_r.json()
+  
+    i = 0
+    while i < lin_list['results']:
+      if lin_list['data'][i]['label'] == instance_name:
+        instance_id = lin_list['data'][i]['id']
+      i = i+1
+
+    ## define the deletion url
+    lin_endpoint_url = "{}/{}".format(lin_endpoint_url,instance_id)
+
+    ## delete a specific linode by id
+    lin_r = requests.delete(lin_endpoint_url,
+                            headers = lin_headers)
+
     print("\nSuccessfully shutting down {}\n".format(instance_name))
 
 ## get the current running state of a specific instance
@@ -329,6 +351,24 @@ def list_existing():
 
     if count == 0:
       print("\nNo instances are configured.\n")
+
+  elif args.cloud == 'linode':
+    ## define the endpoint url
+    lin_endpoint_url = lin_base_url+'linode/instances'
+
+    lin_r = requests.get(lin_endpoint_url,
+                          headers = lin_headers)
+    lin_list = lin_r.json()
+
+    count = 0
+    print("{:<22}{:<15}".format('Name:','Status:'))
+    while count < lin_list['results']:
+      print("{:<22}{:<15}".format(lin_list['data'][count]['label'],
+                                    lin_list['data'][count]['status'] ))
+      count += 1
+    if count == 0:
+      print("\nNo instances are configured.\n")
+
 
 ## error output
 def display_usage():
