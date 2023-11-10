@@ -3,6 +3,9 @@ linode:
   api: '' ## api key
   alias: '' ## full path to the shell config file where aliases can be written
   root: '' ## root password
+  type: ''
+  region: ''
+  image: ''
   ssh_user: ''
 
 aws:
