@@ -8,6 +8,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;pw_check.py - proof of concept for HaveIBeenPwned API range checks for passwords
 
 <b>Cloud</b><p>
+&nbsp;&nbsp;&nbsp;&nbsp;instmgr.py - launch and terminate instances from the cli. 
+Supports AWS, Digital Ocean, and Linode
+
 &nbsp;&nbsp;&nbsp;&nbsp;ec2mgr.py - launch and terminate ec2 instances from the cli. 
 
 &nbsp;&nbsp;&nbsp;&nbsp;dodrop.py - create and destroy droplets on Digital Ocean from the cli.
