@@ -2,7 +2,6 @@
 
 import argparse
 import boto3
-import botocore
 import datetime
 import os
 import re
@@ -42,9 +41,9 @@ with open (cfg_file, 'r') as cfg_f:
 
 if args.cloud == 'aws':
   aws_profile = cloud_conf['aws']['profile']
-  template_name = cloud_conf['aws']['template_id']
-  template_version = str(cloud_conf['aws']['template_version'])
-  ssh_key = cloud_conf['aws']['key']
+  aws_template_name = cloud_conf['aws']['template_id']
+  aws_template_version = str(cloud_conf['aws']['template_version'])
+  aws_ssh_key = cloud_conf['aws']['key']
   bash_file = cloud_conf['aws']['alias']
 elif args.cloud == 'do':
   do_base_url='https://api.digitalocean.com/v2'
@@ -68,7 +67,7 @@ time_suffix = "{}{}{}-{}-{}-{}".format(time_now.year,
                                         time_now.second)
 
 ## establish an AWS api session
-def make_aws_session():
+def aws_make_session():
   session = boto3.Session(profile_name=aws_profile)
   return session
 
@@ -110,7 +109,7 @@ def completion_message(instance_name, instance_ip):
 def create_new(instance_name):
 
   if args.cloud == 'aws':
-    session = make_aws_session()
+    session = aws_make_session()
     client = session.client('ec2')
     ## create a logging tag for instance metadata
     instance_tag = "{}-{}".format(instance_name,time_suffix)
@@ -134,8 +133,8 @@ def create_new(instance_name):
           'Key':'Origin',
           'Value':'boto3'}] }],
       LaunchTemplate={
-        'LaunchTemplateId':template_name,
-        'Version':template_version })
+        'LaunchTemplateId':aws_template_name,
+        'Version':aws_template_version })
 
     ## give aws a few seconds to spin up the instance
     time.sleep(15)
@@ -157,7 +156,7 @@ def create_new(instance_name):
                                   'size': cloud_conf['do']['size'],
                                   'image': cloud_conf['do']['image'],
                                   'tags': [ instance_name ],
-                                  'ssh_keys': [ cloud_conf['do']['ssh_key'] ] }
+                                  'ssh_keys': [ cloud_conf['do']['aws_ssh_key'] ] }
 
     ## send the request to DO, receive feedback on success
     do_r = requests.post(do_droplets_endpoint, headers=do_headers, json=do_droplet_add_attributes)
@@ -203,10 +202,10 @@ def delete_existing(instance_name):
 
   if args.cloud == 'aws':
     ## get the id for the instance 
-    instance_id = get_id(instance_name)
+    instance_id = aws_get_id(instance_name)
 
     ## send the terminate request
-    session = make_aws_session()
+    session = aws_make_session()
     client = session.client('ec2')
     response = client.terminate_instances(
       InstanceIds=[ instance_id ])
@@ -274,8 +273,8 @@ def delete_existing(instance_name):
     print("\nSuccessfully shutting down {}\n".format(instance_name))
 
 ## get the current running state of a specific instance
-def get_state(instance_id):
-  session = make_aws_session()
+def aws_get_state(instance_id):
+  session = aws_make_session()
   ec2 = session.resource('ec2')
   ec2_data = ec2.Instance(instance_id)
   for state in ec2_data.state:
@@ -285,8 +284,8 @@ def get_state(instance_id):
   return instance_state
 
 ## get the name or label of a specific running instance
-def get_name(instance_id):
-  session = make_aws_session()
+def aws_get_name(instance_id):
+  session = aws_make_session()
   ec2 = session.resource('ec2')
   short_name = ''
   ec2_data = ec2.Instance(instance_id)
@@ -297,8 +296,8 @@ def get_name(instance_id):
   return short_name
 
 ## get the id of a specific running instance based on its label
-def get_id(short_name):
-  session = make_aws_session()
+def aws_get_id(short_name):
+  session = aws_make_session()
   client = session.client('ec2')
 
   response = client.describe_instances(
@@ -312,7 +311,7 @@ def get_id(short_name):
 ## print out a list of existing instances and their runnning state
 def list_existing():
   if args.cloud == 'aws':
-    session = make_aws_session()
+    session = aws_make_session()
     client = session.client('ec2')
 
     ## request a list of instances that were created by this script
@@ -328,8 +327,8 @@ def list_existing():
     ## print out the table of instances
     for i in response['Reservations']:
       for j in i['Instances']:
-        instance_name = get_name(j['InstanceId'])
-        instance_state =  get_state(j['InstanceId'])
+        instance_name = aws_get_name(j['InstanceId'])
+        instance_state =  aws_get_state(j['InstanceId'])
         print("{:<22}{:<15}{}".format(j['InstanceId'], instance_state, instance_name))
         count += 1
     if count == 0:
