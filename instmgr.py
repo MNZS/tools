@@ -18,24 +18,32 @@ with open (cfg_file, 'r') as cfg_f:
   cloud_conf = yaml.safe_load(cfg_f)
 
 ## get command line options
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='Manage remote cloud instances.',
+                                  epilog='Add, Remove, and List options should be used individually and not in combination with each other.',
+                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-a','--add',
-      help='add new instance')
+      nargs=1,
+      help='Add a new instance. Specify instance name as argument.')
 parser.add_argument('-r','--remove',
-      help='remove instance')
+      nargs=1,
+      help='Remove existing instance. Specify instance name as argument.')
 parser.add_argument('-c','--cloud',
-      help='cloud platform: aws/do/linode')
+      help='Specify cloud platform for instance. Choose from "AWS, Digital Ocean, or Linode" as argument.',
+      nargs=1,
+      default='aws',
+      choices=['aws', 'do', 'linode'])
 parser.add_argument('-l','--list',
-      action='store_true',
+      nargs=1,
       help='list running instances')
 
 args = parser.parse_args()
 
-## read in config file 
-if args.cloud is None:
-  args.cloud = 'aws'
+if sum( (1 for arg in (args.add, args.remove, args.list) if arg is not None) ) > 1:
+  print("\n  Only --cloud may be combined with other flags.\n")
+  exit()
 
+exit()
 with open (cfg_file, 'r') as cfg_f:
   cloud_conf = yaml.safe_load(cfg_f)
 
