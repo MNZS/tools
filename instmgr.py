@@ -21,11 +21,11 @@ with open (cfg_file, 'r') as cfg_f:
 parser = argparse.ArgumentParser(description='Manage remote cloud instances.',
                                   epilog='Add, Remove, and List options should be used individually and not in combination with each other.',
                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument('-a','--add',
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-a','--add',
       nargs=1,
       help='Add a new instance. Specify instance name as argument.')
-parser.add_argument('-r','--remove',
+group.add_argument('-r','--remove',
       nargs=1,
       help='Remove existing instance. Specify instance name as argument.')
 parser.add_argument('-c','--cloud',
@@ -33,17 +33,16 @@ parser.add_argument('-c','--cloud',
       nargs=1,
       default='aws',
       choices=['aws', 'do', 'linode'])
-parser.add_argument('-l','--list',
-      nargs=1,
+group.add_argument('-l','--list',
+      action='store_true',
       help='list running instances')
 
 args = parser.parse_args()
 
-if sum( (1 for arg in (args.add, args.remove, args.list) if arg is not None) ) > 1:
-  print("\n  Only --cloud may be combined with other flags.\n")
-  exit()
+#if sum( (1 for arg in (args.add, args.remove, args.list) if arg is not None) ) > 1:
+#  print("\n  Only --cloud may be combined with other flags.\n")
+#exit()
 
-exit()
 with open (cfg_file, 'r') as cfg_f:
   cloud_conf = yaml.safe_load(cfg_f)
 
