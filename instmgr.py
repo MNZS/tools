@@ -46,22 +46,21 @@ args = parser.parse_args()
 with open (cfg_file, 'r') as cfg_f:
   cloud_conf = yaml.safe_load(cfg_f)
 
-if args.cloud == 'aws':
+if args.cloud[0] == 'aws':
   aws_profile = cloud_conf['aws']['profile']
   aws_template_name = cloud_conf['aws']['template_id']
   aws_template_version = str(cloud_conf['aws']['template_version'])
   aws_ssh_key = cloud_conf['aws']['key']
   bash_file = cloud_conf['aws']['alias']
-elif args.cloud == 'do':
+elif args.cloud[0] == 'do':
   do_base_url='https://api.digitalocean.com/v2'
   do_droplets_endpoint = do_base_url + '/droplets'
   do_headers = { 'Authorization': 'Bearer '+cloud_conf['do']['api'], 'Content-Type':'application/json' }
-elif args.cloud == 'linode':
+elif args.cloud[0] == 'linode':
   lin_api = cloud_conf['linode']['api']
   lin_base_url = 'https://api.linode.com/v4/'
   lin_headers = { 'Authorization': 'Bearer '+lin_api, 'Content-Type':'application/json' }
 else:
-  print('wrong syntax')
   exit()
 
 ## grab current time and format for logging
@@ -88,17 +87,17 @@ def get_droplet(d_id):
 
 def completion_message(instance_name, instance_ip):
 
-  if args.cloud == 'aws':
+  if args.cloud[0] == 'aws':
     instance_user = 'admin'
     paas = 'AWS'
-  elif args.cloud == 'linode':
+  elif args.cloud[0] == 'linode':
     instance_user = 'root'
     paas = 'Linode'
-  elif args.cloud == 'do':
+  elif args.cloud[0] == 'do':
     instance_user = 'root'
     paas = 'Digital Ocean'
 
-  bash_file = cloud_conf[args.cloud]['alias']
+  bash_file = cloud_conf[args.cloud[0]]['alias']
 
   ## create and insert the new alias for bash file
   alias_update = "alias {}='ssh {}@{}'\n".format(instance_name,
@@ -115,7 +114,7 @@ def completion_message(instance_name, instance_ip):
 ## add a new instance
 def create_new(instance_name):
 
-  if args.cloud == 'aws':
+  if args.cloud[0] == 'aws':
     session = aws_make_session()
     client = session.client('ec2')
     ## create a logging tag for instance metadata
@@ -156,14 +155,15 @@ def create_new(instance_name):
 
     completion_message(instance_name, instance_ip)
 
-  elif args.cloud == 'do':
+  elif args.cloud[0] == 'do':
+
     ## define the new droplet atttributes
     do_droplet_add_attributes = { 'name': instance_name,
                                   'region': cloud_conf['do']['region'],
                                   'size': cloud_conf['do']['size'],
                                   'image': cloud_conf['do']['image'],
                                   'tags': [ instance_name ],
-                                  'ssh_keys': [ cloud_conf['do']['aws_ssh_key'] ] }
+                                  'ssh_keys': [ cloud_conf['do']['ssh_key'] ] }
 
     ## send the request to DO, receive feedback on success
     do_r = requests.post(do_droplets_endpoint, headers=do_headers, json=do_droplet_add_attributes)
@@ -183,7 +183,7 @@ def create_new(instance_name):
 
     completion_message(instance_name, instance_ip)
 
-  elif args.cloud == 'linode':
+  elif args.cloud[0] == 'linode':
     ## define the endpoint url
     lin_endpoint_url = lin_base_url+'linode/instances'
 
@@ -207,7 +207,7 @@ def create_new(instance_name):
 ## terminate an existing instance
 def delete_existing(instance_name):
 
-  if args.cloud == 'aws':
+  if args.cloud[0] == 'aws':
     ## get the id for the instance 
     instance_id = aws_get_id(instance_name)
 
@@ -229,10 +229,11 @@ def delete_existing(instance_name):
 
     print("\nSuccessfully shutting down {}\n".format(instance_name))
 
-  elif args.cloud == 'do':
+  elif args.cloud[0] == 'do':
 
     ## create a new endpoint with the droplet's tag name
     do_droplet_del_endpoint = "%s?tag_name=%s" % (do_droplets_endpoint, instance_name)
+
     do_r = requests.delete(do_droplet_del_endpoint, headers=do_headers)
     #do_del_data = do_r.json()
     ## check on success/fail
@@ -255,7 +256,7 @@ def delete_existing(instance_name):
     ## print out summary of what has been done
     print("\nSuccessfully shutting down {}\n".format(instance_name))
   
-  elif args.cloud == 'linode':
+  elif args.cloud[0] == 'linode':
 
     ## define the endpoint url
     lin_endpoint_url = lin_base_url+'linode/instances'
@@ -317,7 +318,7 @@ def aws_get_id(short_name):
  
 ## print out a list of existing instances and their runnning state
 def list_existing():
-  if args.cloud == 'aws':
+  if args.cloud[0] == 'aws':
     session = aws_make_session()
     client = session.client('ec2')
 
@@ -341,7 +342,7 @@ def list_existing():
     if count == 0:
       print("\nNo instances are configured.\n")
 
-  elif args.cloud == 'do':
+  elif args.cloud[0] == 'do':
     do_r = requests.get(do_droplets_endpoint, headers=do_headers)
     do_data = do_r.json()
 
@@ -359,7 +360,7 @@ def list_existing():
     if count == 0:
       print("\nNo instances are configured.\n")
 
-  elif args.cloud == 'linode':
+  elif args.cloud[0] == 'linode':
     ## define the endpoint url
     lin_endpoint_url = lin_base_url+'linode/instances'
 
@@ -389,12 +390,12 @@ def main():
     list_existing()
   elif args.remove:
     try:
-      delete_existing(args.remove)
+      delete_existing(args.remove[0])
     except:
       display_usage() 
   elif args.add:
     try:
-      create_new(args.add)
+      create_new(args.add[0])
     except:
       display_usage()
   else:
