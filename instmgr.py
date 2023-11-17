@@ -84,6 +84,21 @@ def get_droplet(d_id):
   do_droplet_data = do_r.json()
   return do_droplet_data
 
+def delete_completion_message(instance_name,alias_file):
+
+  ## remove the alias from .bash_local
+  with open(alias_file, "r+") as f:
+    d = f.readlines()
+    f.seek(0)
+    for i in d:
+      if re.match("alias\ %s" % instance_name,i):
+        continue 
+      else:
+        f.write(i)
+    f.truncate()
+
+  ## print out summary of what has been done
+  print("\nSuccessfully shutting down {}\n".format(instance_name))
 
 def completion_message(instance_name, instance_ip):
 
@@ -217,17 +232,8 @@ def delete_existing(instance_name):
     response = client.terminate_instances(
       InstanceIds=[ instance_id ])
 
-    ## update the local bash file to remove alias
-    with open(cloud_conf['aws']['alias'], "r+") as f:
-      d = f.readlines()
-      f.seek(0)
-      for i in d:
-        if re.match("alias\ {}".format(instance_name),i):
-          continue 
-        f.write(i)
-      f.truncate()
-
-    print("\nSuccessfully shutting down {}\n".format(instance_name))
+    delete_completion_message(instance_name,
+                              cloud_conf['aws']['alias'] )
 
   elif args.cloud[0] == 'do':
 
@@ -242,19 +248,9 @@ def delete_existing(instance_name):
     ## use the id to make a call for name and linux version to confirm
     ## probably break this out into its own subroutine
 
-    ## remove the alias from .bash_local
-    with open(cloud_conf['do']['alias'], "r+") as f:
-      d = f.readlines()
-      f.seek(0)
-      for i in d:
-        if re.match("alias\ %s" % instance_name,i):
-          continue 
-        else:
-          f.write(i)
-      f.truncate()
+    delete_completion_message(instance_name,
+                              cloud_conf['do']['alias'] )
 
-    ## print out summary of what has been done
-    print("\nSuccessfully shutting down {}\n".format(instance_name))
   
   elif args.cloud[0] == 'linode':
 
@@ -278,7 +274,8 @@ def delete_existing(instance_name):
     lin_r = requests.delete(lin_endpoint_url,
                             headers = lin_headers)
 
-    print("\nSuccessfully shutting down {}\n".format(instance_name))
+    delete_completion_message(instance_name,
+                              cloud_conf['do']['alias'] )
 
 ## get the current running state of a specific instance
 def aws_get_state(instance_id):
