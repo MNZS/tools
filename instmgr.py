@@ -39,10 +39,6 @@ group.add_argument('-l','--list',
 
 args = parser.parse_args()
 
-#if sum( (1 for arg in (args.add, args.remove, args.list) if arg is not None) ) > 1:
-#  print("\n  Only --cloud may be combined with other flags.\n")
-#exit()
-
 with open (cfg_file, 'r') as cfg_f:
   cloud_conf = yaml.safe_load(cfg_f)
 
@@ -79,7 +75,7 @@ def aws_make_session():
 
 ## gets information from DO on a specific droplet
 def get_droplet(d_id):
-  do_droplet_get_endpoint = "%s/%s" % (do_droplets_endpoint, d_id)
+  do_droplet_get_endpoint = f"{do_droplets_endpoints}/{d_id}"
   do_r = requests.get(do_droplet_get_endpoint, headers=do_headers)
   do_droplet_data = do_r.json()
   return do_droplet_data
@@ -88,17 +84,14 @@ def delete_completion_message(instance_name,alias_file):
 
   ## remove the alias from .bash_local
   with open(alias_file, "r+") as f:
-    d = f.readlines()
+    content = f.readlines()
     f.seek(0)
-    for i in d:
-      if re.match("alias\ %s" % instance_name,i):
-        continue 
-      else:
-        f.write(i)
+    for line in [ line for line in content if re.match(f'(?!alias\ {instance_name})',line) ]:
+      f.write(line)
     f.truncate()
 
   ## print out summary of what has been done
-  print("\nSuccessfully shutting down {}\n".format(instance_name))
+  print(f"\nSuccessfully shutting down {instance_name}\n")
 
 def completion_message(instance_name, instance_ip):
 
@@ -115,9 +108,8 @@ def completion_message(instance_name, instance_ip):
   bash_file = cloud_conf[args.cloud[0]]['alias']
 
   ## create and insert the new alias for bash file
-  alias_update = "alias {}='ssh {}@{}'\n".format(instance_name,
-                                                  instance_user,
-                                                  instance_ip)
+  alias_update = f"alias {instance_name}='ssh {instance_user}@{instance_ip}'\n"
+
   with open (bash_file,"a") as bash_out:
     bash_out.write(alias_update)
 
@@ -191,7 +183,7 @@ def create_new(instance_name):
     time.sleep(45)
     
     ## create a new api endpoint based on the droplet's id to grab ip address
-    do_droplet_get_endpoint = "%s/%i" % (do_droplets_endpoint, do_data['droplet']['id'])
+    do_droplet_get_endpoint = f"{do_droplets_endpoint}/{do_data['droplet']['id']}"
     do_get_r = requests.get(do_droplet_get_endpoint, headers=do_headers)
     do_get_data = do_get_r.json()
     instance_ip = do_get_data['droplet']['networks']['v4'][0]['ip_address']
@@ -238,7 +230,7 @@ def delete_existing(instance_name):
   elif args.cloud[0] == 'do':
 
     ## create a new endpoint with the droplet's tag name
-    do_droplet_del_endpoint = "%s?tag_name=%s" % (do_droplets_endpoint, instance_name)
+    do_droplet_del_endpoint = f"{do_droplets_endpoint}?tag_name={instance_name}"
 
     do_r = requests.delete(do_droplet_del_endpoint, headers=do_headers)
     #do_del_data = do_r.json()
