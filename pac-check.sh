@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 LOG='/var/log/pac-check.log'
+LOG_PATH='/var/log'
+LOG_FILE='pac-check.log'
 TMP_FILE='/tmp/pac.update'
 
 function calendar () {
@@ -37,6 +39,24 @@ function update_motd () {
 
   /sbin/shutdown -r 05:00
 }
+
+function log_rotate() {
+  i='6'
+  [[ -f $LOG_PATH/$LOG_FILE.$i ]] \
+    && rm -f  $LOG_PATH/$LOG_FILE.$i
+
+  while [ $i -gt '0' ]; do
+    [[ -f $LOG_PATH/$LOG_FILE.$i ]] \
+      && mv $LOG_PATH/$LOG_FILE.$i $LOG_PATH/$LOG_FILE.$(($i+1))
+    i=$(($i-1))
+  done
+
+  mv $LOG_PATH/$LOG_FILE $LOG_PATH/$LOG_FILE.1
+  TIME=$(calendar ymdhms)
+  echo "$TIME * Rotated log files" >> $LOG
+
+}
+
 
 function check_for_updates() {
 
@@ -88,6 +108,9 @@ function run_error_check {
 ## main
 if [ -z $1 ]; then
   run_error_check
+  exit 0
+elif [ $1 == 'rotate' ]; then
+  log_rotate
   exit 0
 elif [ $1 == 'cleanup' ]; then
   cleanup_motd
