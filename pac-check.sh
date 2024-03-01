@@ -4,6 +4,7 @@ LOG='/var/log/pac-check.log'
 LOG_PATH='/var/log'
 LOG_FILE='pac-check.log'
 TMP_FILE='/tmp/pac.update'
+TODAY=`date +%d`
 
 function calendar () {
   if [ $1 == 'ymdhms' ]; then
@@ -109,6 +110,9 @@ function run_error_check {
 if [ -z $1 ]; then
   run_error_check
   exit 0
+elif [ $TODAY == '01' ]; then
+  log_rotate
+  check_for_updates
 elif [ $1 == 'rotate' ]; then
   log_rotate
   exit 0
