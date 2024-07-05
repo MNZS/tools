@@ -90,7 +90,7 @@ function check_for_updates() {
 function check_for_upgrade () {
 
   TIME=$(calendar ymdhms)
-  echo "$TIME - Checking for OS upgrade" >> $LOG 2>&1
+  echo "$TIME - Checking for new Debian Release" >> $LOG 2>&1
 
   ## Current $VERSION_CODENAME
   . /etc/os-release
@@ -102,7 +102,7 @@ function check_for_upgrade () {
 
   MIRROR_CODENAME=`curl $DEB_MIRROR | grep -i codename | cut -d' ' -f2` 2>&1
   if [ -z $MIRROR_CODENAME ]; then
-    echo "$TIME - ERROR when checking for OS upgrade" >> $LOG 2>&1
+    echo "$TIME - ERROR when checking for new Debian Release" >> $LOG 2>&1
     echo "  Could not get Release information from Debian mirror" >> $LOG 2>&1
     exit 1
   elif [ $VERSION_CODENAME == $MIRROR_CODENAME ]; then
