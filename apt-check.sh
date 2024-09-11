@@ -77,6 +77,10 @@ function check_for_updates() {
     done < /tmp/apt.update
 
     /usr/bin/apt full-upgrade -y 2>&1
+    
+    ## attempt to avoid error output
+    dpkg --configure -a
+
     TIME=$(calendar ymdhms)
     echo "$TIME - Updates completed" >> $LOG 2>&1
   else
@@ -133,6 +137,9 @@ function check_for_upgrade () {
 
     ## get rid of dependencies
     apt autoremove --purge
+
+    ## testing to avoid errors
+    dpkg --configure -a
     
     TIME=$(calendar ymd)
     echo "$TIME - Upgrade completed." >> $LOG 2>&1
