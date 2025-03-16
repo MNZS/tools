@@ -49,7 +49,7 @@ function update_motd () {
   echo >> /etc/motd
   echo >> /etc/motd
 
-  /sbin/shutdown -r 05:00 
+  #/sbin/shutdown -r 05:00 
 }
 
 function check_for_updates() {
@@ -57,6 +57,7 @@ function check_for_updates() {
   TIME=$(calendar ymdhms)
 
   echo "$TIME - Checking for updates" >> $LOG 2>&1
+  /bin/bash /root/bin/disco.sh "$TIME - Checking for updates"
 
   /usr/bin/apt update > /tmp/apt.update 2>&1
 
@@ -64,6 +65,7 @@ function check_for_updates() {
     NUM=`tail -1 /tmp/apt.update | cut -d ' ' -f 1`
     TIME=$(calendar ymdhms)
     echo "$TIME - $NUM updates found" >> $LOG 2>&1
+    /bin/bash /root/bin/disco.sh "$TIME - $NUM updates found (apt-check)"
 
     apt list --upgradable | grep '/' >/tmp/apt.update
 
@@ -74,6 +76,7 @@ function check_for_updates() {
     while read -r line; do
       PKG=`echo $line | cut -d '[' -f1` 2>&1
       echo "  $PKG" >> $LOG 2>&1
+      /bin/bash /root/bin/disco.sh "-- $PKG updated"
     done < /tmp/apt.update
 
     /usr/bin/apt full-upgrade -y 2>&1
@@ -83,9 +86,11 @@ function check_for_updates() {
 
     TIME=$(calendar ymdhms)
     echo "$TIME - Updates completed" >> $LOG 2>&1
+    /bin/bash /root/bin/disco.sh "$TIME - Updates completed"
   else
     TIME=$(calendar ymdhms)	
     echo "$TIME - No updates found" >> $LOG 2>&1
+    /bin/bash /root/bin/disco.sh "$TIME - No updates found"
   fi
 
   #rm -f /tmp/apt.update
